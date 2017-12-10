@@ -4,6 +4,7 @@ import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.hamcrest.CoreMatchers.`is`
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertThat
 import org.junit.Before
 
@@ -45,5 +46,12 @@ class RedditApiTest {
         val call = redditApi.accessToken(GRANT_TYPE, deviceId)
         val response = call.execute()
         assertThat(response.body()?.token_type, `is`("bearer"))
+    }
+
+    @Test
+    fun testSubreddit() {
+        val call = redditApi.subreddit("aww")
+        val response = call.execute().body()
+        assertNotNull(response)
     }
 }

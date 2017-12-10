@@ -2,38 +2,51 @@ package com.bendaschel.kotlinplayground
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.Toast
+import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
+import kotlinx.android.synthetic.main.content_main.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity() {
 
+    val redditApi by lazy {
+        Retrofit.Builder()
+                .baseUrl("https://www.reddit.com")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(RedditApi::class.java)
+    }
+
+    val adapter by lazy {
+        PostAdapter()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
+        recycler_main.adapter = adapter
+        recycler_main.layoutManager = LinearLayoutManager(this)
+
+        fetchData()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
+    private fun fetchData() {
+        redditApi.subreddit("aww")
+                .enqueue(object: Callback<SubredditResponse> {
+                    override fun onResponse(call: Call<SubredditResponse>?, response: Response<SubredditResponse>?) {
+                        adapter.update(response?.body()?.data?.children!!)
+                    }
+
+                    override fun onFailure(call: Call<SubredditResponse>?, t: Throwable?) {
+                        Log.e("MainActivity", "Fetching subreddits failed", t)
+                    }
+
+                })
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        val id = item.itemId
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
-    fun showAboutToast() {
-        Toast.makeText(this, "Created by Ben Daschel", Toast.LENGTH_LONG).show()
-    }
 }

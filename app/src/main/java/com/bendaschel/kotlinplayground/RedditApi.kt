@@ -9,4 +9,7 @@ interface RedditApi {
     @Headers("Content-Type: application/x-www-form-urlencoded")
     fun accessToken(@Query("grant_type") grantType: String = "https://oauth.reddit.com/grants/installed_client",
                     @Query("device_id") deviceId: String): Call<AuthResponse>
+
+    @GET("/r/{subreddit}.json")
+    fun subreddit(@Path("subreddit") name: String): Call<SubredditResponse>
 }
