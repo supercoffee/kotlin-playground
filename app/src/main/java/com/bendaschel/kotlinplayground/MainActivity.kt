@@ -3,13 +3,12 @@ package com.bendaschel.kotlinplayground
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
 import kotlinx.android.synthetic.main.content_main.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import ru.gildor.coroutines.retrofit.awaitResponse
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,17 +35,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchData() {
-        redditApi.subreddit("aww")
-                .enqueue(object: Callback<SubredditResponse> {
-                    override fun onResponse(call: Call<SubredditResponse>?, response: Response<SubredditResponse>?) {
-                        adapter.update(response?.body()?.data?.children!!)
-                    }
-
-                    override fun onFailure(call: Call<SubredditResponse>?, t: Throwable?) {
-                        Log.e("MainActivity", "Fetching subreddits failed", t)
-                    }
-
-                })
+        async(UI) {
+            val response = getSubreddit("aww")
+            adapter.update(response?.data?.children!!)
+        }
     }
+
+    private suspend fun getSubreddit(name: String): SubredditResponse? =
+        redditApi.subreddit(name).awaitResponse().body()
 
 }
