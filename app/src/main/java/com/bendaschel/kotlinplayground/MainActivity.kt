@@ -12,14 +12,6 @@ import ru.gildor.coroutines.retrofit.awaitResponse
 
 class MainActivity : AppCompatActivity() {
 
-    val redditApi by lazy {
-        Retrofit.Builder()
-                .baseUrl("https://www.reddit.com")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(RedditApi::class.java)
-    }
-
     val adapter by lazy {
         PostAdapter()
     }
@@ -41,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun getSubreddit(name: String): SubredditResponse? =
+    private suspend fun getSubreddit(name: String): ListingWrapper? =
         redditApi.subreddit(name).awaitResponse().body()
 
 }

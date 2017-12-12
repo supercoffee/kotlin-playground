@@ -1,9 +1,12 @@
 package com.bendaschel.kotlinplayground
 
+import com.google.gson.annotations.SerializedName
+
 data class PostData (
         val id: String,
         val title: String,
-        val thumbnail: String
+        val thumbnail: String,
+        @SerializedName("url") val contentUrl: String
 )
 
 data class Post (
@@ -17,7 +20,7 @@ data class ListingData (
         val children: List<Post>
 )
 
-data class SubredditResponse(
+data class ListingWrapper(
         val kind: String,
         val data: ListingData
 )

@@ -11,5 +11,9 @@ interface RedditApi {
                     @Query("device_id") deviceId: String): Call<AuthResponse>
 
     @GET("/r/{subreddit}.json")
-    fun subreddit(@Path("subreddit") name: String): Call<SubredditResponse>
+    fun subreddit(@Path("subreddit") name: String): Call<ListingWrapper>
+
+
+    @GET("/comments/{threadId}/.json")
+    fun comments(@Path("threadId") name: String): Call<List<ListingWrapper>>
 }
