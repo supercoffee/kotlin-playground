@@ -1,5 +1,6 @@
 package com.bendaschel.kotlinplayground
 
+import android.content.Intent
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.squareup.picasso.Picasso
 
+/**
+ * Binder class for Post models to recycler view layout
+ */
 class PostAdapter: RecyclerView.Adapter<PostVH>() {
 
     private val posts = mutableListOf<Post>()
@@ -37,6 +41,11 @@ class PostVH (val view: View): RecyclerView.ViewHolder(view) {
     fun bind(post: Post) {
         titleView.text = post.data.title
         Picasso.with(imageView.context).load(post.data.thumbnail).into(imageView)
+        view.setOnClickListener {
+            val intent = Intent(it.context, ThreadActivity::class.java)
+            intent.putExtra("threadId", post.data.id)
+            it.context.startActivity(intent)
+        }
     }
 
 }
