@@ -1,13 +1,21 @@
 package com.bendaschel.kotlinplayground
 
 import android.app.Activity
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import com.squareup.picasso.Picasso
+import com.squareup.picasso.Transformation
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import kotlinx.android.synthetic.main.activity_thread.*
+import org.jetbrains.anko.doAsyncResult
+import android.R.attr.bitmap
+import android.graphics.Color
+import android.support.v7.graphics.Palette
+
+
 
 class ThreadActivity: Activity() {
 
@@ -32,9 +40,43 @@ class ThreadActivity: Activity() {
 
                 Picasso.with(this@ThreadActivity)
                         .load(data.contentUrl)
+                        // TODO: do image color blur on background
+                        .transform(object: Transformation {
+                            override fun key(): String {
+                                return data.contentUrl
+                            }
+
+                            override fun transform(source: Bitmap): Bitmap {
+                                val p = Palette.from(source).generate()
+                                val defaultColor = resources.getColor(R.color.default_image_background)
+                                thread_card.post {
+                                    thread_card.setCardBackgroundColor(p.preferredColor)
+                                }
+                                return source
+                            }
+
+                        })
                         .into(img_post)
             }
 
         })
     }
+}
+
+val Palette.preferredColor: Int
+get() {
+    val methodOrder: List<(Int) -> Int> = listOf(
+            this::getDarkVibrantColor,
+            this::getDarkMutedColor,
+            this::getLightVibrantColor,
+            this::getLightMutedColor,
+            this::getDominantColor
+    )
+    var bestColor: Int = Color.WHITE
+
+    methodOrder.forEach {
+        bestColor = it(bestColor)
+    }
+
+    return bestColor
 }
